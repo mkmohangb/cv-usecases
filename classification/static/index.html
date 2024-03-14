@@ -1,0 +1,46 @@
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"></script>
+  </head>
+<body>
+    <div id="app" style="width:50%; margin: 200px auto">
+      <form id="imageForm" enctype="multipart/form-data" method="POST" style="text-align: center; display: block">
+        <label for="imageFile">Select image to classify:</label>
+        <input id="imageFile" name="file" type="file" style="margin-left: 10px" />
+        <img v-if="image" :src="image" style="width: 250px; display: block; margin: 50px auto 10px" />
+        <div v-if="prediction" style="font-size: 32px; font-weight: bold; text-align: center">
+                    {{ prediction }}
+        </div>
+        <input v-if="image" type="submit" value="Classify Image" style="margin: 20px 20px"/>
+      </form>
+    </div>
+<script>
+    var app = new Vue({
+      el: "#app",
+      data() {
+        return {
+          image: null,
+          prediction: null
+        };
+      },
+    });
+
+    document.getElementById("imageForm").addEventListener("submit", (e) => {
+      axios.post('/predict', 
+                 new FormData(document.getElementById("imageForm")), 
+                { headers: { "Content-Type": "multipart/form-data", }, })
+               .then((response) => (app.prediction = response.data));
+      e.preventDefault();
+    });
+
+    document.getElementById("imageFile").addEventListener("change", (e) => {
+      const [file] = document.getElementById("imageFile").files;
+      if (file) {
+        app.image = URL.createObjectURL(file);
+      }
+    });
+
+    </script>
+  </body>
+</html>
